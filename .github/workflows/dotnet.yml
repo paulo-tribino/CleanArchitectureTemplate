@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      FOLDER_PATH: Back-End/Hubit.sln
+      FOLDER_PATH: Template.sln
 
     steps:
     - uses: actions/checkout@v4
