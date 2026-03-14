@@ -21,34 +21,13 @@
 
 ## 📐 Architecture Overview
 
-```mermaid
-graph TD
-    A[WebApi] --> B[Presentation]
-    B --> C[Infrastructure]
-    B --> D[Persistence]
-    C --> E[Application]
-    D --> E
-    E --> F[Domain]
-    E --> G[SharedKernel]
-    F --> G
-    
-    style A fill:#e1f5ff
-    style B fill:#fff3e0
-    style C fill:#f3e5f5
-    style D fill:#f3e5f5
-    style E fill:#e8f5e9
-    style F fill:#fff9c4
-    style G fill:#ffebee
-```
-
-### Layer Responsibilities
-
 | Layer | Responsibility | Dependencies |
 |-------|---------------|--------------|
+| **SharedKernel** | Cross-cutting primitives (Entity, Error, Result) | None
 | **Domain** | Business entities, rules, and abstractions | SharedKernel only |
-| **Application** | Use cases, CQRS handlers, DTOs | Domain, SharedKernel |
-| **Infrastructure** | External services, authentication, clients | Application, Domain |
-| **Persistence** | Database access, EF Core, repositories | Application, Domain |
+| **Application** | Use cases, CQRS handlers, DTOs | Domain |
+| **Infrastructure** | External services, authentication, clients | Application |
+| **Persistence** | Database access, EF Core, repositories | Application |
 | **Presentation** | API endpoints, validators, HTTP concerns | Infrastructure, Application |
 | **WebApi** | Composition root, configuration, middleware | All layers |
 
@@ -261,7 +240,7 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
 ```csharp
 // 1. Create Query/Command
-public sealed record GetProductByIdQuery(Guid Id) : IQuery<ProductDto>;
+public sealed record GetProductByIdQuery(Guid Id, int page, int pageSize) : IQuery<ProductDto>;
 
 // 2. Create Handler
 internal sealed class GetProductByIdQueryHandler 
@@ -278,26 +257,26 @@ internal sealed class GetProductByIdQueryHandler
         GetProductByIdQuery request,
         CancellationToken cancellationToken)
     {
-        if (_dbContext is not DbContext dbContext)
-            return Result.Failure<ProductDto>(ProductErrors.DatabaseUnavailable);
-
-        var product = await dbContext.Set<Product>()
-            .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+        var productDtoQuery = _dbContext.Product
+            .Where(p => p.Id == request.Id)
+            .Select(p => new productDto(
+                p.Id,
+                p.Name,
+                p.Price))
+             .FirstOrDefaultAsync(cancellationToken);
 
         if (product is null)
+        {
             return Result.Failure<ProductDto>(ProductErrors.NotFound(request.Id));
+        }
 
-        var dto = new ProductDto(product.Id, product.Name, product.Price);
-        return Result.Success(dto);
+        return Result.Success(product);
     }
 }
 
 // 3. Define errors
 public static class ProductErrors
 {
-    public static readonly Error DatabaseUnavailable = 
-        new("Product.DatabaseUnavailable", "Cannot connect to database");
-
     public static Error NotFound(Guid id) => 
         new("Product.NotFound", $"Product with ID {id} not found");
 }
@@ -325,6 +304,7 @@ internal sealed class GetProductById : IEndpoint
         CancellationToken cancellationToken)
     {
         var query = new GetProductByIdQuery(id);
+
         var result = await sender.Send(query, cancellationToken);
 
         return result.IsSuccess
