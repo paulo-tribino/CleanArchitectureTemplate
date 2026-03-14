@@ -2,6 +2,7 @@
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
+[![CI](https://github.com/paulo-tribino/CleanArchitectureTemplate/actions/workflows/dotnet.yml/badge.svg)](https://github.com/paulo-tribino/CleanArchitectureTemplate/actions/workflows/dotnet.yml)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
 
 > A production-ready .NET 8 template implementing Clean Architecture, Domain-Driven Design (DDD), and Command Query Responsibility Segregation (CQRS) patterns.
