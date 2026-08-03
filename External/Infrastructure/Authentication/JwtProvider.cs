@@ -19,27 +19,42 @@ internal sealed class JwtProvider : IJwtProvider
 
     public string Generate()
     {
-        var claims = new Claim[]
-        {
-            //new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
-            //new(JwtRegisteredClaimNames.Email, user.Email),
-            //new(JwtRegisteredClaimNames.Name, user.FirstName),
-        };
+        var claims = BuildClaims();
 
-        var signingCredential = new SigningCredentials(
+        var signingCredentials = BuildSigningCredentials();
+
+        return BuildTokenValue(claims, signingCredentials);
+    }
+
+    private static IEnumerable<Claim> BuildClaims()
+    {
+        //new Claim[]
+        //{
+        //    new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+        //    new(JwtRegisteredClaimNames.Email, user.Email),
+        //    new(JwtRegisteredClaimNames.Name, user.FirstName),
+        //};
+
+        return Enumerable.Empty<Claim>();
+    }
+
+    private SigningCredentials BuildSigningCredentials()
+    {
+        return new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configurations.SecretKey)),
             SecurityAlgorithms.HmacSha256);
+    }
 
+    private string BuildTokenValue(IEnumerable<Claim> claims, SigningCredentials signingCredentials)
+    {
         var token = new JwtSecurityToken(
             _configurations.Issuer,
             _configurations.Audience,
             claims,
             notBefore: null,
             DateTime.UtcNow.AddHours(_configurations.ExpiresInHours),
-            signingCredential);
+            signingCredentials);
 
-        var tokenValue = new JwtSecurityTokenHandler().WriteToken(token);
-
-        return tokenValue;
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.OpenApi.Models;
 using Persistence.DI;
 using Presentation.DI;
 using Presentation.Extensions;
+using Presentation.Middleware;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,6 +61,8 @@ if (app.Environment.IsDevelopment())
 app.UseCors("CorsPolicy");
 
 app.UseSerilogRequestLogging();
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.UseHttpsRedirection();
 

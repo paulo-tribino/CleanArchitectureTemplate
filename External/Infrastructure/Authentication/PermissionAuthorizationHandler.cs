@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Domain.Enums;
+using Infrastructure.Constants;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Infrastructure.Authentication;
 
@@ -9,26 +12,49 @@ public sealed class PermissionAuthorizationHandler : AuthorizationHandler<Permis
         AuthorizationHandlerContext context,
         PermissionRequirement requirement)
     {
-        var userId = context.User.Claims.FirstOrDefault(c =>
-            c.Type.Equals(JwtRegisteredClaimNames.Sub))?.Value;
-
-        if (!Guid.TryParse(userId, out var parsedUserId))
+        if (!TryGetUserId(context.User, out _))
         {
             return;
         }
 
-        context.Succeed(requirement);
+        if (!TryGetPermissionId(requirement.Permission, out var permissionId))
+        {
+            return;
+        }
 
-        return;
-
-        // TODO set permissions on user claims
-
-        var permission = context.User.Claims.FirstOrDefault(c =>
-            c.Value.Equals(requirement.Permission));
-
-        if (permission is not null)
+        if (HasPermissionClaim(context.User, permissionId))
         {
             context.Succeed(requirement);
         }
+    }
+
+    private static bool TryGetUserId(ClaimsPrincipal user, out Guid userId)
+    {
+        var userIdValue = user.Claims
+            .FirstOrDefault(c => c.Type.Equals(JwtRegisteredClaimNames.Sub))?.Value;
+
+        return Guid.TryParse(userIdValue, out userId);
+    }
+
+    private static bool TryGetPermissionId(string permissionName, out string permissionId)
+    {
+        if (!Enum.TryParse(permissionName, out Permission permission))
+        {
+            permissionId = string.Empty;
+            return false;
+        }
+
+        permissionId = ((int)permission).ToString();
+
+        return true;
+    }
+
+    private static bool HasPermissionClaim(ClaimsPrincipal user, string permissionId)
+    {
+        var hasPermission = user.Claims.Any(c =>
+            c.Type == ClaimConstants.PermissionClaimType &&
+            c.Value == permissionId);
+
+        return hasPermission;
     }
 }

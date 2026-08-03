@@ -39,20 +39,21 @@ Back-End/
 ├── Core/
 │   ├── Domain/                    # Business entities and rules
 │   │   ├── Entities/             # Domain entities (empty - ready to implement)
-│   │   ├── Abstractions/         # Interfaces (IUnitOfWork, IApplicationDbContext)
+│   │   ├── Abstractions/         # Interfaces
 │   │   ├── Primitives/           # Enumeration base class
 │   │   └── Errors/               # Domain-specific errors
 │   │
 │   └── Application/               # Use cases and CQRS
 │       ├── UseCases/             # Feature-organized handlers
 │       │   └── Health/Queries/   # Example: Health check
-│       ├── Abstractions/         # ICommand, IQuery, ICommandHandler, IQueryHandler
+│       ├── Abstractions/         # ICommand, IQuery, ICommandHandler, IQueryHandler, IUnitOfWork, IApplicationDbContext
 │       ├── Dtos/                 # Data transfer objects
 │       └── DI/                   # Dependency injection configuration
 │
 ├── External/
 │   ├── Infrastructure/            # External concerns
 │   │   ├── Authentication/       # JWT provider, authorization handlers
+│   │   ├── Constants/            # Infrastructure constants
 │   │   ├── Hashers/              # Password hashing (PBKDF2)
 │   │   ├── Clients/              # External API clients (ready to implement)
 │   │   └── DI/                   # Dependency injection
@@ -66,7 +67,7 @@ Back-End/
 │   └── Presentation/              # API layer
 │       ├── Endpoints/            # Minimal API endpoints
 │       ├── Attributes/           # [HasPermission] attribute
-│       └── Extensions/           # HttpContext, Result extensions
+│       └── Extensions/           # HttpContext
 │
 ├── SharedKernel/                  # Cross-cutting primitives
 │   ├── Entity.cs                 # Base entity with Guid Id
@@ -398,7 +399,6 @@ This template is actively being improved. Here's what's planned:
 - [ ] FluentValidation pipeline behavior
 - [ ] Value Object base class
 - [ ] Aggregate Root pattern
-- [ ] Audit fields (CreatedAt, UpdatedAt, etc.)
 - [ ] Soft delete support
 
 ### Future Enhancements

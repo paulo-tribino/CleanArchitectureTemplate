@@ -1,4 +1,4 @@
-﻿using Domain.Abstractions;
+﻿using Application.Abstractions.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

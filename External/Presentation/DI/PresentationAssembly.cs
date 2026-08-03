@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DI;
 
-public static class PresentationAssembly
+internal static class PresentationAssembly
 {
     public static readonly Assembly Assembly = typeof(PresentationAssembly).Assembly;
 }

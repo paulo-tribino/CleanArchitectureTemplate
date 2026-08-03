@@ -1,10 +1,10 @@
+using Application.Abstractions.Database;
 using Application.Abstractions.Messaging;
 using Application.Constants.Health;
 using Application.Dtos;
 using Application.Dtos.Enums;
 using Application.Errors;
 using Application.Extensions;
-using Domain.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using SharedKernel;
 
