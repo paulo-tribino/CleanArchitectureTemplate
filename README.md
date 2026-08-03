@@ -404,7 +404,7 @@ This template is actively being improved. Here's what's planned:
 ### Future Enhancements
 - [ ] Integration tests project
 - [ ] Docker support (Dockerfile, docker-compose)
-- [ ] GitHub Actions CI/CD
+- [ ] GitHub Actions CD
 - [ ] Rate limiting
 - [ ] API versioning
 - [ ] Health checks endpoint
